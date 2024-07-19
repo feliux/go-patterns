@@ -7,15 +7,18 @@ import (
 	"net/http"
 )
 
+// APIError is a custom error handler.
 type APIError struct {
 	StatusCode int `json:"statusCode"`
 	Msg        any `json:"msg"`
 }
 
+// Error implements the Error interface for APIError.
 func (e APIError) Error() string {
 	return fmt.Sprintf("statuscode %d with msg %s", e.StatusCode, e.Msg)
 }
 
+// NewAPIError creates a new APIError instance.
 func NewAPIError(statuscode int, err error) APIError {
 	return APIError{
 		StatusCode: statuscode,
@@ -23,6 +26,7 @@ func NewAPIError(statuscode int, err error) APIError {
 	}
 }
 
+// InvalidRequestData sends an error with a http.StatusUnprocessableEntity.
 func InvalidRequestData(errors map[string]string) APIError {
 	return APIError{
 		StatusCode: http.StatusUnprocessableEntity,
@@ -30,14 +34,17 @@ func InvalidRequestData(errors map[string]string) APIError {
 	}
 }
 
+// InvalidJSON sends an error with a http.StatusBadRequest.
 func InvalidJSON() APIError {
 	return NewAPIError(http.StatusBadRequest, fmt.Errorf("Invalid JSON request data"))
 }
 
+// CustomData is a custom type for the name.
 type CustomData struct {
 	Name string `json:"name"`
 }
 
+// validate validates that the name contains more than 3 letters.
 func (c CustomData) validate() map[string]string {
 	errors := make(map[string]string)
 	if len(c.Name) < 3 {
@@ -46,6 +53,7 @@ func (c CustomData) validate() map[string]string {
 	return errors
 }
 
+// CustomHandler handles requests for decoding JSON data into CustomData.
 func CustomHandler(w http.ResponseWriter, r *http.Request) error {
 	if r.Method == http.MethodPost {
 		var customData CustomData
@@ -62,6 +70,7 @@ func CustomHandler(w http.ResponseWriter, r *http.Request) error {
 	}
 }
 
+// Make is a custom handler.
 func Make(h func(http.ResponseWriter, *http.Request) error) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if err := h(w, r); err != nil {
@@ -82,6 +91,7 @@ func Make(h func(http.ResponseWriter, *http.Request) error) http.HandlerFunc {
 	}
 }
 
+// writeJSON write the response to the client.
 func writeJSON(w http.ResponseWriter, statuscode int, v any) error {
 	w.WriteHeader(statuscode)
 	w.Header().Set("Content-type", "application/json")
@@ -90,7 +100,7 @@ func writeJSON(w http.ResponseWriter, statuscode int, v any) error {
 
 // func main() {
 // 	// this method sends "not implemented" when method is not a POST. Inside if
-// 	// curl -X POST http://localhost:3000 -d '{"name": "fo"}'
+// 	// curl -X POST http://localhost:3000 -d '{"name": "foo"}'
 // 	http.HandleFunc("/", Make(CustomHandler))
 // 	http.ListenAndServe(":3000", nil)
 // }

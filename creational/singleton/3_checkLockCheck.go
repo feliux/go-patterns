@@ -2,18 +2,25 @@ package main
 
 import (
 	"fmt"
+	"sync"
 	"time"
 )
 
+// DriverPg is the driver for PSQL.
 type DriverPg struct {
 	conn string
 }
 
-var instance *DriverPg
+var (
+	instance *DriverPg
+	lock     = &sync.Mutex{}
+)
 
+// Connect just connects to the database.
 func Connect() *DriverPg {
 	if instance == nil {
-		// Not thread safe when using goroutines
+		lock.Lock()
+		defer lock.Unlock()
 		instance = &DriverPg{conn: "DriverConnectPostgres"}
 	}
 	return instance

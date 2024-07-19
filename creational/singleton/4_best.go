@@ -11,10 +11,12 @@ var (
 	instance *DriverPg // global variable
 )
 
+// DriverPg is the driver for PSQL.
 type DriverPg struct {
 	conn string
 }
 
+// Connect just connects to the database.
 func Connect() *DriverPg {
 	once.Do(func() {
 		instance = &DriverPg{conn: "DriverConnectPostgres"}

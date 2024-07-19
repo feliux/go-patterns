@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// DriverPg is the driver for PSQL.
 type DriverPg struct {
 	conn string
 }
@@ -15,10 +16,12 @@ var (
 	lock     = &sync.Mutex{}
 )
 
+// Connect just connects to the database.
 func Connect() *DriverPg {
+	// Lock here is so aggresive cause the following if evaluation
+	lock.Lock()
+	defer lock.Unlock()
 	if instance == nil {
-		lock.Lock()
-		defer lock.Unlock()
 		instance = &DriverPg{conn: "DriverConnectPostgres"}
 	}
 	return instance

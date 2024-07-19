@@ -37,6 +37,7 @@ func main() {
 
 // To Functional Options Pattern
 
+// Server contains the server configuration.
 type Server struct {
 	host    string
 	port    int
@@ -44,6 +45,7 @@ type Server struct {
 	maxConn int
 }
 
+// New creates a server instance with custom options.
 func New(options ...func(*Server)) *Server {
 	svr := &Server{}
 	for _, opt := range options {
@@ -52,29 +54,34 @@ func New(options ...func(*Server)) *Server {
 	return svr
 }
 
+// Start runs the server
 func (s *Server) Start() error {
 	// todo
 	return nil
 }
 
+// WithHost configures the address fot the server.
 func WithHost(host string) func(*Server) {
 	return func(s *Server) {
 		s.host = host
 	}
 }
 
+// WithPort configures the port for the server.
 func WithPort(port int) func(*Server) {
 	return func(s *Server) {
 		s.port = port
 	}
 }
 
+// WithTimeout configures the timeout for the server.
 func WithTimeout(timeout time.Duration) func(*Server) {
 	return func(s *Server) {
 		s.timeout = timeout
 	}
 }
 
+// WithMacConn configures the maximum number of connections to the server.
 func WithMaxConn(maxConn int) func(*Server) {
 	return func(s *Server) {
 		s.maxConn = maxConn

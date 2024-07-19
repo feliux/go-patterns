@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// Client includes parameter for the HTTP client.
 type Client struct {
 	client          *http.Client
 	timeout         time.Duration
@@ -16,6 +17,7 @@ type Client struct {
 // Option is a functional option type that allows us to configure the Client.
 type Option func(*Client)
 
+// NewClient creates the HTTP client with custom options.
 func NewClient(options ...Option) *Client {
 	client := &Client{
 		client:          &http.Client{},
@@ -30,24 +32,28 @@ func NewClient(options ...Option) *Client {
 	return client
 }
 
+// WithTimeout set the timeout for the client request.
 func WithTimeout(timeout time.Duration) Option {
 	return func(c *Client) {
 		c.timeout = timeout
 	}
 }
 
+// WithUserAgent the user-agent of the client.
 func WithUserAgent(userAgent string) Option {
 	return func(c *Client) {
 		c.userAgent = userAgent
 	}
 }
 
+// WithRedirects configue the client to follow redirects.
 func WithoutRedirects() Option {
 	return func(c *Client) {
 		c.followRedirects = false
 	}
 }
 
+// UseInsecureTransport configure the client to no verify trusted certificates.
 func UseInsecureTransport() Option {
 	return func(c *Client) {
 		c.client.Transport = &http.Transport{
@@ -56,6 +62,7 @@ func UseInsecureTransport() Option {
 	}
 }
 
+// Get performs a HTTP GET passing the custom client object.
 func (c *Client) Get(url string) (*http.Response, error) {
 	// Use c.client with all the configured options to perform the request.
 	// ...
